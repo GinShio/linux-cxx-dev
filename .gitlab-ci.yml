@@ -1,0 +1,30 @@
+stages:
+  - create-image
+  - production-release
+
+variables:
+  DOCKER_BUILDKIT: 1
+
+.create_multi_arch_image:
+  image: docker:latest
+  services:
+   - name: docker:dind
+     command: ["--experimental"]
+  before_script:
+    - docker login -u $CI_BUILD_USERNAME -p $CI_BUILD_TOKEN
+    - apk add curl make
+    - mkdir -vp ~/.docker/cli-plugins/
+    - curl --silent -L "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.linux-amd64" > ~/.docker/cli-plugins/docker-buildx
+    - chmod a+x ~/.docker/cli-plugins/docker-buildx
+    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    - docker buildx create --use
+    - docker buildx inspect --bootstrap
+  after_script:
+    - docker logout
+    - rm -f $HOME/.docker/config.json
+
+create:
+  extends: .create_multi_arch_image
+  stage: create-image
+  script:
+    - make multibuild

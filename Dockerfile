@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.3-labs
+
 #
 #   Copyright (C) 2017-2022 CASM Organization <https://casm-lang.org>
 #   All rights reserved.
@@ -21,27 +23,45 @@
 #   along with casm-lang.container.linux. If not, see <http://www.gnu.org/licenses/>.
 #
 
-FROM oblique/archlinux-yay
+# Copyright (C) 2022 GinShio
 
-RUN sudo pacman --noconfirm -Syy && \
-    sudo -u aur yay --noconfirm -S \
-    bash \
-    git \
-    make \
-    cmake \
-    openssh \
-    curl \
-    wget \
-    tar \
-    python \
-    bison \
-    flex \
-    gcc \
-    clang \
-    openmp \
-    emscripten \
-    z3 \
-    gtest \
-    hayai-git
 
-CMD ["/bin/bash"]
+FROM debian:bullseye-slim
+
+# RUN { \
+#     echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye main contrib non-free"; \
+#     echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-updates main contrib non-free"; \
+#     echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bullseye-backports main contrib non-free"; \
+#     echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian-security bullseye-security main contrib non-free"; \
+#  } |tee /etc/apt/sources.list;
+
+RUN apt update -y && apt upgrade -y; \
+    apt install --no-install-recommends -y \
+                   bash \
+                   bison \
+                   build-essential \
+                   clang \
+                   clang-tidy \
+                   cmake \
+                   cython3 \
+                   doxygen \
+                   flex \
+                   gdb \
+                   make \
+                   ninja-build \
+                   libboost-all-dev \
+                   libevent-dev \
+                   libfmt-dev \
+                   libjemalloc-dev \
+                   libjsoncpp-dev \
+                   libopenblas-dev \
+                   libopenmpi-dev \
+                   libpcre2-dev \
+                   librttr-dev \
+                   libspdlog-dev \
+                   libthrift-dev \
+                   libxml2-dev \
+                   libzstd-dev \
+                   pcre2-utils \
+                   valgrind; \
+    apt clean && apt autoremove

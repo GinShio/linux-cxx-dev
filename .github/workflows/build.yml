@@ -21,24 +21,31 @@
 #   along with casm-lang.container.linux. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Copyright (C) 2022 GinShio
+
 name: build
 
 on: [push]
 
 jobs:
   docker:
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Building
+    - name: Checkout
+      uses: actions/checkout@v3
+    # - name: Set up QEMU
+    #   uses: docker/setup-qemu-action@v2
+    # - name: Set up Docker Buildx
+    #   id: buildx
+    #   uses: docker/setup-buildx-action@v2
+    # - name: Available platforms
+    #   run: echo ${{ steps.buildx.outputs.platforms }}
+    - name: Build
       run:  |
         make build
-    - name: Deploying
-      run:  |
-        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-        make deploy
-        docker logout
-        rm -f $HOME/.docker/config.json
+    # - name: Deploy
+    #   run:  |
+    #     echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    #     make deploy
+    #     docker logout
+    #     rm -f $HOME/.docker/config.json

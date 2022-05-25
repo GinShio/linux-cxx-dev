@@ -21,31 +21,56 @@
 #   along with casm-lang.container.linux. If not, see <http://www.gnu.org/licenses/>.
 #
 
-TARGET := casmlang/container.linux
+# MIT License
+#
+# curl-docker Copyright (c) 2020 James Fuller (jim.fuller@webcomposite.com)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD | sed "s/\//-/g")
+# Copyright (C) 2022 GinShio
 
-ifdef GITHUB_WORKFLOW
-  # https://help.github.com/en/articles/virtual-environments-for-github-actions#environment-variables
-  BRANCH := $(shell echo $(GITHUB_REF) | sed "s/refs\/heads\///g" | sed "s/\//-/g")
-endif
+TARGET := ginshio/cxxdev
 
+DOCKER_TAG := bullseye
 
-ifeq (${BRANCH},master)
-  DOCKER_TAG := :latest
-else
-  ifneq (${BRANCH},)
-    DOCKER_TAG := :${BRANCH}
-  endif
-endif
+DOCKER_IMAGE := ${TARGET}:${DOCKER_TAG}
 
-DOCKER_IMAGE := ${TARGET}${DOCKER_TAG}
+# from curl-docker <https://github.com/curl/curl-docker/blob/master/Makefile>
+DOCKER_BUILD_ARGS :=
+
+# from curl-docker <https://github.com/curl/curl-docker/blob/master/Makefile>
+DOCKER_BUILD_OPTS := --no-cache --compress
+
+# from curl-docker <https://github.com/curl/curl-docker/blob/master/Makefile>
+DOCKER_MULTI_ARCH := linux/amd64,linux/arm64,linux/ppc64le,linux/mips64le,linux/arm/v7
 
 default: build
 
 build:
 	@echo "-- docker: build '${DOCKER_IMAGE}'"
-	docker build -t ${DOCKER_IMAGE} .
+	DOCKER_BUILDKIT=1 docker build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} -t ${DOCKER_IMAGE} .
+
+multibuild:
+	@echo "-- docker: multibuild '${DOCKER_IMAGE}'"
+	DOCKER_BUILDKIT=1 docker buildx build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} -t "${DOCKER_IMAGE}" --platform=${DOCKER_MULTI_ARCH} -f Dockerfile . --push
+	@docker buildx imagetools inspect ${DOCKER_IMAGE}
+	docker buildx imagetools ${DOCKER_IMAGE} -t "${TARGET}:latest"
 
 run:
 	@echo "-- docker: run '${DOCKER_IMAGE}'"
@@ -53,4 +78,4 @@ run:
 
 deploy:
 	@echo "-- docker: push '${DOCKER_IMAGE}'"
-	docker push ${DOCKER_IMAGE}
+	docker push "${DOCKER_IMAGE}" "${TARGET}:latest"
