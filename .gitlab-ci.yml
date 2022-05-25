@@ -11,7 +11,7 @@ variables:
    - name: docker:dind
      command: ["--experimental"]
   before_script:
-    - docker login -u $CI_BUILD_USERNAME -p $CI_BUILD_TOKEN
+    - echo $CI_BUILD_TOKEN |docker login -u $CI_BUILD_USERNAME --password-stdin
     - apk add curl make
     - mkdir -vp ~/.docker/cli-plugins/
     - curl --silent -L "https://github.com/docker/buildx/releases/download/v$BUILDX_VERSION/buildx-v$BUILDX_VERSION.linux-amd64" > ~/.docker/cli-plugins/docker-buildx

@@ -70,7 +70,7 @@ multibuild:
 	@echo "-- docker: multibuild '${DOCKER_IMAGE}'"
 	DOCKER_BUILDKIT=1 docker buildx build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} -t "${DOCKER_IMAGE}" --platform=${DOCKER_MULTI_ARCH} -f Dockerfile . --push
 	@docker buildx imagetools inspect ${DOCKER_IMAGE}
-	docker buildx imagetools ${DOCKER_IMAGE} -t "${TARGET}:latest"
+	docker buildx imagetools create ${DOCKER_IMAGE} -t "${TARGET}:latest"
 
 run:
 	@echo "-- docker: run '${DOCKER_IMAGE}'"

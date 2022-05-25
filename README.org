@@ -29,9 +29,8 @@ Provides a =Dockerfile= which creates a C++ build environment for Linux,
 which is pushed after a successful build automatically to 
 https://hub.docker.com/r/ginshio/cxxdev.
 
-** Status
-
-[[https://github.com/GinShio/linux-cxx-dev/workflows/build/badge.svg]]
+** Status [[https://gitlab.com/GinShio/linux-cxx-dev/badges/master/pipeline.svg]]
+# [[https://github.com/GinShio/linux-cxx-dev/workflows/build/badge.svg]]
 
 The docker container provides a C++ development environment.
 
